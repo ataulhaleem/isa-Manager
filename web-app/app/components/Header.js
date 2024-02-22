@@ -80,6 +80,8 @@ import { Card, CardContent, Typography, Button,  Link, Grid } from '@mui/materia
 
 export default function Header() {
   return (
+    <>
+    
     <Card sx={{ mb: 1, backgroundColor: '#a1bdc7' }}>
       <CardContent>
         <Grid
@@ -127,6 +129,15 @@ export default function Header() {
                 </Button>
               </Link>
             </Grid>
+
+            <Grid item>
+              <Link href="/SubmitISA">
+                <Button variant="contained" color="info">
+                  Submit
+                </Button>
+              </Link>
+            </Grid>
+
             <Grid item>
               <Link href="/About">
                 <Button variant="contained" color="success">
@@ -138,5 +149,12 @@ export default function Header() {
         </Grid>
       </CardContent>
     </Card>
+
+<div>
+<Typography variant='h6' color={'red'} > <b>Note:</b> The input data will stay on you device. </Typography>
+<Typography variant='p' >  </Typography>
+</div>
+</>
+
   );
 }
