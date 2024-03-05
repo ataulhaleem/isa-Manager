@@ -1,11 +1,9 @@
-'use client'
+"use client"
 
 import React, { useEffect, useState } from 'react'
 import { Button, Box, Typography, Grid, Paper, TextField, Autocomplete } from '@mui/material'
-import InvestigationForm from '../components/InvestigationForm'
-import StudyForm from '../components/StudyForm'
-import AssayForm from '../components/AssayForm'
 
+// import JSONTree from "react-json-tree";
 import ReactJson from 'react-json-view'
 import Accordion from '@mui/material/Accordion'
 import AccordionActions from '@mui/material/AccordionActions'
@@ -79,6 +77,79 @@ class Assay {
   // Getters and setters for each property if needed
 }
 
+function downloadJson(jsonObject, filename) {
+  // Convert object to JSON string
+  const jsonString = JSON.stringify(jsonObject, null, 2);
+
+  // Create a Blob object
+  const blob = new Blob([jsonString], { type: 'application/json' });
+
+  // Create a URL for the Blob
+  const url = URL.createObjectURL(blob);
+
+  // Create an anchor element
+  const a = document.createElement('a');
+
+  // Set the href attribute to the URL of the Blob
+  a.href = url;
+
+  // Set the download attribute to the filename
+  a.download = filename || 'data.json';
+
+  // Programmatically click on the anchor element to trigger the download
+  a.click();
+
+  // Cleanup: Revoke the URL
+  URL.revokeObjectURL(url);
+}
+
+
+// Function to convert a JavaScript object to a TSV string
+function objectToTsv(obj) {
+  function flatten(obj) {
+    const result = {};
+    for (const key in obj) {
+      if (Array.isArray(obj[key])) {
+        obj[key].forEach((item, index) => {
+          flatten(item).forEach((value, i) => {
+            result[`${key}_${index + 1}_${i + 1}`] = value;
+          });
+        });
+      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+        flatten(obj[key]).forEach((value, i) => {
+          result[`${key}_${i + 1}`] = value;
+        });
+      } else {
+        result[key] = obj[key];
+      }
+    }
+    return result;
+  }
+
+  const flattenedObj = flatten(obj);
+
+  const headers = Object.keys(flattenedObj);
+  const rows = [headers.map(header => flattenedObj[header])];
+
+  return rows.map(row => row.join('\t')).join('\n');
+}
+
+
+
+// Function to download TSV files
+function downloadTsv(data, filename) {
+  const tsvString = objectToTsv(data);
+  console.log(tsvString)
+  const blob = new Blob([tsvString], { type: 'text/tsv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename || 'data.tsv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
 export default function MetadataForm () {
   var investigation = new Investigation({});
   var study = new Study({});
@@ -92,7 +163,23 @@ export default function MetadataForm () {
   const [selectedStudy, setSelectedStudy] = useState(null);
   const [assayCounter, setAssayCounter ] = useState(0)
 
+const handleJsonDownload = () => {
+  downloadJson(investigation, investigation.filename)
+}
 
+const handleIsaTabDownload = () => {
+  // Download investigation.tsv
+  downloadTsv(investigation, 'investigation.tsv');
+  // Download study.tsv and assay.tsv for each study and assay
+  investigation.studies.forEach(study => {
+    downloadTsv(study, `Study_${study.identifier}.tsv`);
+    if (study.assays) {
+      study.assays.forEach(assay => {
+        downloadTsv(assay, `Assay_${assay.identifier}.tsv`);
+      });
+    }
+  });
+}
 
   
   const [assayData, setAssayData] = useState(assay)
@@ -196,7 +283,6 @@ export default function MetadataForm () {
     const dateString = date.format('YYYY-MM-DD')
     setStudyData({ ...studyData, publicReleaseDate: dateString })
   }
-
 
   return (
     <>
@@ -545,6 +631,10 @@ export default function MetadataForm () {
                 </AccordionActions>
               </Accordion>
 
+              {!studyCounter > 0 ||
+
+
+
               <Accordion>
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
@@ -676,21 +766,7 @@ sx={{ mb: 1 }}
                 </AccordionActions>
               </Accordion>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
             </Grid>
 
@@ -702,7 +778,7 @@ sx={{ mb: 1 }}
             sx={{ padding: 1 }}
             style={{ border: '2px solid green', minHeight: '100px' }}
           >
-            <ReactJson src={investigationData} />
+            <ReactJson src={investigation} />
           </Paper>
         </Grid>
 
@@ -713,8 +789,8 @@ sx={{ mb: 1 }}
 
 
       <Grid>
-        <Button> Downolad ISA-Tab</Button>
-        <Button> Downolad ISA-json</Button>
+        <Button onClick={handleIsaTabDownload}> Downolad ISA-Tab</Button>
+        <Button onClick={handleJsonDownload}> Downolad ISA-json</Button>
       </Grid>
     </>
   )
