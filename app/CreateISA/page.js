@@ -167,6 +167,10 @@ export default function MetadataForm() {
   const [selectedStudy, setSelectedStudy] = useState(null);
   const [assayCounter, setAssayCounter] = useState(0);
 
+  useEffect(() => {
+
+  },[investigationData])
+
   const handleJsonDownload = () => {
     downloadJson(investigation, investigation.filename);
   };
@@ -236,8 +240,10 @@ export default function MetadataForm() {
     // investigationData.studies.assays.push(studyData)
     investigationData.studies.map((study) => {
       if (study.identifier == selectedStudy) {
-        console.log(selectedStudy);
-      }
+        console.log(study.assays.push(assay));
+        setAssayCounter(assayCounter + 1);
+        setAssayData(new Assay({}));
+        }
     });
 
     setAssayCounter(assayCounter + 1);
@@ -829,7 +835,7 @@ export default function MetadataForm() {
             style={{ border: "2px solid green", minHeight: "100px" }}
           >
             {/* <ReactJson src={investigation} theme="solarized"/>  */}
-            <ReactJson src={investigation}/> 
+            <ReactJson src={investigationData}/> 
 
 
           </Paper>
