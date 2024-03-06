@@ -7,7 +7,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <Container maxWidth='lg'>
+        <Container maxWidth='ld'>
           <Header />
           {children}
         </Container>
