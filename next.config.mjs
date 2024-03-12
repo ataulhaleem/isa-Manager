@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output:'export',
-    basePath: 'isa-Manager',
+    basePath: '/isa-Manager',
     reactStrictMode : true
   };
   /* module.exports = nextConfig*/
