@@ -1,7 +1,8 @@
 "use client"
 import * as React from "react";
 
-import { Card, CardContent, Typography, Button,  Link, Grid } from '@mui/material';
+import { Card, CardContent, Typography, Button,  Grid } from '@mui/material';
+import Link from "next/link";
 
 export default function Header() {
   return (
