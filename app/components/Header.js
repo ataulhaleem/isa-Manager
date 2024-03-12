@@ -1,80 +1,5 @@
 // "use client"
 import * as React from "react";
-// export default function Header() {
-
-//   return (
-
-//     <Card sx={{mb :1}}>
-//       {/* <CardMedia component="img" height="140" image="/dna.jpg" alt="DNA" /> */}
-//       <CardContent>
-
-//         <Grid
-//           container
-//           direction="column"
-//           // justifyContent="space-between"
-//           alignItems="center"
-//         >
-// <Typography variant="h5" color="text.secondary" fontSize={50}>
-//             isaCreatorJS
-//           </Typography>
-//          <Typography variant="body2" color="text.secondary">
-//           isaCreatorJS is a web based tool for manipulating ISA-Tab and ISA-Json files. 
-//           It allows one to create new meta data files in ISA formats, validate existing metadata files and 
-//           convert between formats.
-          
-//         </Typography>
-//           <div>
-//           <Link href="/Home">
-//             <Button
-//               // onClick={handleClick}
-//             >
-//               Home
-//             </Button>
-//             </Link>
-
-//             <Link href="/CreateISA">
-//             <Button
-//               // onClick={handleClick}
-//             >
-//               Create
-//             </Button>
-//             </Link>
-
-
-//             <Link href="/ValidateISA">
-//             <Button
-//               // onClick={handleClick}
-//             >
-//               Validate
-//             </Button>
-//             </Link>
-
-
-//             <Link href="/ConvertISA">
-//             <Button
-//               // onClick={handleClick}
-//             >
-//               Convert
-//             </Button>
-//             </Link>
-
-
-//             <Link href="/About">
-//             <Button
-//               // onClick={handleClick}
-//             >
-//               About
-//             </Button>
-//             </Link>
-//           </div>
-//         </Grid>
-
-
-//       </CardContent>
-
-//     </Card>
-//   );
-// }
 
 import { Card, CardContent, Typography, Button,  Link, Grid } from '@mui/material';
 
@@ -91,10 +16,10 @@ export default function Header() {
           spacing={2}
         >
           <Typography sx={{mt:4}} variant="h5" color="primary" fontSize={50}>
-            isaCreatorJs
+            isaManager
           </Typography>
           <Typography variant="body2" color="text.secondary" fontSize={20}>
-            isaCreatorJS is a web-based tool for manipulating ISA-Tab and ISA-Json files. 
+            isaManager is a web-based tool for manipulating ISA-Tab and ISA-Json files. 
           </Typography>
           <Typography variant="body2" color="text.secondary" fontSize={20}>
             It allows one to create new meta-data files in ISA formats, validate existing metadata files, and convert between formats.

@@ -111,48 +111,48 @@ function downloadJson(jsonObject, filename) {
   URL.revokeObjectURL(url);
 }
 
-// Function to convert a JavaScript object to a TSV string
-function objectToTsv(obj) {
-  function flatten(obj) {
-    const result = {};
-    for (const key in obj) {
-      if (Array.isArray(obj[key])) {
-        obj[key].forEach((item, index) => {
-          flatten(item).forEach((value, i) => {
-            result[`${key}_${index + 1}_${i + 1}`] = value;
-          });
-        });
-      } else if (typeof obj[key] === "object" && obj[key] !== null) {
-        flatten(obj[key]).forEach((value, i) => {
-          result[`${key}_${i + 1}`] = value;
-        });
-      } else {
-        result[key] = obj[key];
-      }
-    }
-    return result;
-  }
+// // Function to convert a JavaScript object to a TSV string
+// function objectToTsv(obj) {
+//   function flatten(obj) {
+//     const result = {};
+//     for (const key in obj) {
+//       if (Array.isArray(obj[key])) {
+//         obj[key].forEach((item, index) => {
+//           flatten(item).forEach((value, i) => {
+//             result[`${key}_${index + 1}_${i + 1}`] = value;
+//           });
+//         });
+//       } else if (typeof obj[key] === "object" && obj[key] !== null) {
+//         flatten(obj[key]).forEach((value, i) => {
+//           result[`${key}_${i + 1}`] = value;
+//         });
+//       } else {
+//         result[key] = obj[key];
+//       }
+//     }
+//     return result;
+//   }
 
-  const flattenedObj = flatten(obj);
+//   const flattenedObj = flatten(obj);
 
-  const headers = Object.keys(flattenedObj);
-  const rows = [headers.map((header) => flattenedObj[header])];
+//   const headers = Object.keys(flattenedObj);
+//   const rows = [headers.map((header) => flattenedObj[header])];
 
-  return rows.map((row) => row.join("\t")).join("\n");
-}
+//   return rows.map((row) => row.join("\t")).join("\n");
+// }
 
-// Function to download TSV files
-function downloadTsv(data, filename) {
-  const tsvString = objectToTsv(data);
-  console.log(tsvString);
-  const blob = new Blob([tsvString], { type: "text/tsv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename || "data.tsv";
-  a.click();
-  URL.revokeObjectURL(url);
-}
+// // Function to download TSV files
+// function downloadTsv(data, filename) {
+//   const tsvString = objectToTsv(data);
+//   console.log(tsvString);
+//   const blob = new Blob([tsvString], { type: "text/tsv" });
+//   const url = URL.createObjectURL(blob);
+//   const a = document.createElement("a");
+//   a.href = url;
+//   a.download = filename || "data.tsv";
+//   a.click();
+//   URL.revokeObjectURL(url);
+// }
 
 export default function MetadataForm() {
   var investigation = new Investigation({});
@@ -167,28 +167,62 @@ export default function MetadataForm() {
   const [selectedStudy, setSelectedStudy] = useState(null);
   const [assayCounter, setAssayCounter] = useState(0);
 
-  useEffect(() => {
-
-  },[investigationData])
 
   const handleJsonDownload = () => {
-    downloadJson(investigation, investigation.filename);
+    downloadJson(investigationData, investigation.filename);
   };
 
   const handleIsaTabDownload = () => {
-    // Download investigation.tsv
-    downloadTsv(investigation, "investigation.tsv");
-    // Download study.tsv and assay.tsv for each study and assay
-    investigation.studies.forEach((study) => {
-      downloadTsv(study, `Study_${study.identifier}.tsv`);
+    // Create an array to store TSV content for each file
+    const tsvFiles = [];
+  
+    // Generate investigation.tsv
+    const investigationTSV = generateTSV(investigationData);
+    tsvFiles.push({ content: investigationTSV, filename: "investigation.tsv" });
+  
+    // Generate study.tsv and assay.tsv for each study and assay
+    investigationData.studies.forEach((study) => {
+      const studyTSV = generateTSV(study);
+      tsvFiles.push({ content: studyTSV, filename: `Study_${study.identifier}_${investigationData.identifier}.tsv` });
+  
       if (study.assays) {
         study.assays.forEach((assay) => {
-          downloadTsv(assay, `Assay_${assay.identifier}.tsv`);
+          const assayTSV = generateTSV(assay);
+          tsvFiles.push({ content: assayTSV, filename: `Assay_${assay.identifier}_${study.identifier}.tsv` });
         });
       }
     });
+    
+    // Trigger download for each file
+    tsvFiles.forEach(({ content, filename }) => {
+      downloadTSVFile(content, filename);
+    });
+  };
+  
+  
+  const generateTSV = (data) => {
+    let tsv = "";
+    for (const [key, value] of Object.entries(data)) {
+      if (Array.isArray(value)) {
+        tsv += `${key}\t${value.join(',')}\n`;
+      } else {
+        tsv += `${key}\t${value}\n`;
+      }
+    }
+    return tsv;
+  };
+  
+  const downloadTSVFile = (tsvContent, filename) => {
+    const blob = new Blob([tsvContent], { type: "text/tsv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
   };
 
+  
+  
   const [assayData, setAssayData] = useState(assay);
 
   const handleStudyChange = (event, newValue) => {
@@ -227,28 +261,50 @@ export default function MetadataForm() {
     }
   };
 
+
   const handleAddStudy = () => {
-    var studiesCopy = studies;
-    studiesCopy.push(studyData.identifier);
-    setStudies(studiesCopy);
-    investigationData.studies.push(studyData);
+    // Create a copy of the studies array and add the new study identifier
+    const updatedStudies = [...studies, studyData.identifier];
+  
+    // Create a copy of the investigationData with the updated studies array
+    const updatedInvestigationData = {
+      ...investigationData,
+      studies: [...investigationData.studies, studyData]
+    };
+  
+    // Set the state with the updated studies array and investigationData
+    setStudies(updatedStudies);
+    setInvestigationData(updatedInvestigationData);
+  
+    // Other state updates
     setStudyCounter(studyCounter + 1);
     setStudyData(new Study({}));
   };
+  
 
   const handleAddAssay = () => {
-    // investigationData.studies.assays.push(studyData)
-    investigationData.studies.map((study) => {
-      if (study.identifier == selectedStudy) {
-        console.log(study.assays.push(assay));
-        setAssayCounter(assayCounter + 1);
-        setAssayData(new Assay({}));
+    // Create a copy of the investigationData with the updated assays array
+    const updatedInvestigationData = {
+      ...investigationData,
+      studies: investigationData.studies.map(study => {
+        if (study.identifier === selectedStudy) {
+          return {
+            ...study,
+            assays: [...study.assays, assay]
+          };
         }
-    });
-
+        return study;
+      })
+    };
+  
+    // Set the state with the updated investigationData
+    setInvestigationData(updatedInvestigationData);
+  
+    // Other state updates
     setAssayCounter(assayCounter + 1);
     setAssayData(new Assay({}));
   };
+  
 
   const handleChangeAssay = (e) => {
     // const { name, value } = e.target
@@ -834,8 +890,10 @@ export default function MetadataForm() {
             sx={{ padding: 1 }}
             style={{ border: "2px solid green", minHeight: "100px" }}
           >
+
             {/* <ReactJson src={investigation} theme="solarized"/>  */}
-            <ReactJson src={investigationData}/> 
+             <ReactJson src={investigationData}/> 
+
 
 
           </Paper>
