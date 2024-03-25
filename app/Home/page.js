@@ -7,15 +7,24 @@ export default function Home() {
   return (
     <>
     <Grid container>
+      <Grid item ></Grid>
     <Typography variant='p'>
       ISA stands for "Investigation, Study, and Assay." ISA specifications refer to a set of standards for describing and exchanging metadata related to experimental metadata in life sciences research. These specifications are developed and maintained by the ISA Commons community, which includes researchers, developers, and organizations involved in data management and sharing.
       </Typography>
+
       <Typography variant='p'>
-The ISA specifications consist of several components:
+The ISA specifications consist of several components specified through the following isa model:
       </Typography>
+
+      <figure>
+  <img style={{ width: '100%' }} src='https://isa-specs.readthedocs.io/en/latest/_images/isa_model_1_ccoded.png' alt='ISA model' />
+  <figcaption>This image is adapted from https://isa-specs.readthedocs.io/en/latest/isamodel.html.</figcaption>
+</figure>
+
       <Typography variant='p'>
 ISA-Tab: ISA-Tab is a tabular format for describing experimental metadata. It provides a simple and structured way to represent metadata for investigations, studies, and assays in a tab-delimited format. ISA-Tab files are organized into three main sections: Investigation, Study, and Assay.
       </Typography>
+
       <Typography variant='p'>
 ISA-JSON: ISA-JSON is a JSON-based format for representing ISA metadata. It provides a more flexible and machine-readable alternative to ISA-Tab. ISA-JSON files encapsulate the same metadata as ISA-Tab but in a hierarchical JSON structure.
       </Typography>
